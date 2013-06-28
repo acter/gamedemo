@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      SanGuoGame
+    </title>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <meta name="apple-mobile-web-app-capable" content="yes" />
+   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+   <link rel="apple-touch-icon" href="images/icon.png"/>
+   <link rel="apple-touch-startup-image" href="images/icon.png" />
+
+    <style type="text/css">
+    body, div, canvas
+    {
+        image-rendering: optimizeSpeed;
+        -webkit-image-rendering: optimizeSpeed;
+        -webkit-interpolation-mode: nearest-neighbor;
+    }
+   body{padding:0; margin:0;font-size:12px;background: #c5e8d6;}
+   body, html{height: 100%;}
+    #outer{height:100%; overflow:hidden; position:relative; width:100%;}
+    #outer[id]{display:table; position:static;}
+    #middle{position:absolute; top:50%;} /* for ie only*/
+    #middle[id]{display:table-cell; vertical-align:middle; position:static;}
+    #mainContainer{border:1px solid blue;background-color:white;}
+    #heroContainer{border:1px solid red;background-color:red}
+    </style>
+    <script type="text/javascript" src="../quark.base-1.0.0.alpha.min.js"></script>
+
+  </head>
+  <body>
+ 
+        <div id="outer">
+            <div id="middle">
+              <div id="container" style="position:relative;width:600px;height:500px;top:-50%;margin:0 auto;border:1px solid red"></div>
+              <div id="msg"></div>
+            </div>
+          TIPS:red box inside  is stage<br/>
+            white background is DOM</br/>
+            red background is event area
+        </div>
+
+        <div id="fps" style="position:absolute;top:0;left:0;color:#fff;"></div>
+     
+  </body>
+</html>
+<script type="text/javascript">
+var container,mainContainer;
+window.onload = init;
+  var em = new Q.EventManager();
+   var events = Quark.supportTouch ? ["touchstart","touchmove", "touchend"] : ["mousedown","mousemove", "mouseup","mouseout"];
+function init()
+{
+  container = Quark.getDOM("container");
+  context = new Quark.DOMContext({canvas:container});
+
+  //init stage
+  stage = new Quark.Stage({width:600, height:500, context:context, update:update});  
+
+
+ 
+  em.registerStage(stage, events);
+  
+  //init mainContainer
+   mainContainer = new Q.DisplayObjectContainer({id:"mainContainer",x:15, width:480, height:480,
+     eventChildren:true, transformEnabled:false,useHandCursor:false});
+
+   // show on mainContainer heroContainer
+   showhero(mainContainer);
+
+   // show stagte
+   stage.addChild(mainContainer);
+
+  var fps = 60;
+  timer = new Q.Timer(1000/fps);
+  timer.addListener(stage);
+  timer.addListener(Q.Tween);
+  timer.start();
+} 
+function showhero(container)
+{
+  heroContainer = new Q.DisplayObjectContainer({id:"heroContainer",x:20,y:30,width:370,height:180,eventChildren:false,
+    transformEnabled:false,useHandCursor:true});
+    heroContainer.onEvent = function(e)
+    {
+      if(e.type == events[0])
+      {
+        console.log(e.eventX+e.eventY);
+      }
+    }
+  container.addChild(heroContainer);
+}
+function update()
+{
+  frames++;
+}    
+var frames = 0, fpsContainer = Quark.getDOM("fps");
+setInterval(function()
+{
+  fpsContainer.innerHTML = "FPS:" + frames;
+  frames = 0;
+}, 1000);
+</script>
