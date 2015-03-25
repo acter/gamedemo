@@ -1,0 +1,40 @@
+--checkTouchPos
+local function checkTouchPos(x,y)
+    --display.cx display.cy 屏幕中心点
+   -- 判断触摸点位置
+    function getDirection(x,y)
+        local direct = "left_bottom"
+        if x <= display.cx and y <= display.cy then
+            direct = "left_bottom"
+        elseif x > display.cx and y > display.cy then
+            direct = "right_top"
+        elseif x > display.cx and y < display.cy then
+            direct = "right_bottom"
+        elseif x < display.cx and y > display.cy then
+            direct = "left_top"
+        end
+
+        return direct
+    end
+
+    -- 判断是否是上下左右都触摸过
+    self.m_touchDirect = self.m_touchDirect or {}
+    local direction = getDirection(x,y)
+    if #self.m_touchDirect == 0 then
+        table.insert(self.m_touchDirect, direction)
+    else
+        if #self.m_touchDirect < 4 then
+            for i = 1, #self.m_touchDirect do
+                if self.m_touchDirect[i] == direction then
+                    -- 触摸相同方向，清楚当前操作
+                    self.m_touchDirect = {}
+                    break
+                end
+            end
+            table.insert(self.m_touchDirect, direction)
+        elseif #self.m_touchDirect == 4 then
+           --egg show
+            self.m_touchDirect = nil
+        end
+    end
+end
